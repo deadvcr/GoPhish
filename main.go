@@ -163,6 +163,10 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0600)
 	}
+	fmt.Println("[!] Login retrieved!")
+	fmt.Println("[!] Username: " + p.Username)
+	fmt.Println("[!] Password: " + p.Password)
+	fmt.Println("[*] Saved to " + path + "/" + filename)
 
 	return ioutil.WriteFile(path+"/"+filename, b, 0600)
 }
