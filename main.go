@@ -41,6 +41,11 @@ type ChoiceHandler struct {
 	Redir  string
 }
 
+type Defaults struct {
+	Redirect string
+	BindIP   string
+}
+
 func menu() {
 	fmt.Println("")
 	fmt.Println("")
@@ -74,21 +79,28 @@ func menu() {
 	fmt.Println("")
 	fmt.Println("")
 
+	loaddefaults, err := ioutil.ReadFile("defaults.json")
+	var defaults Defaults
+	if err != nil {
+		log.Fatal(err)
+	}
+	json.Unmarshal([]byte(loaddefaults), &defaults)
+
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("[*] Choose an option: ")
 	choice, _ := reader.ReadString('\n')
-	fmt.Print("[*] Choose redirect URL (Default is google.com): ")
+	fmt.Print("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
 	redir, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter IP and port to listen on (Default is 127.0.0.1:8080): ")
+	fmt.Print("[*] Enter IP and port to listen on (Default is " + defaults.BindIP + "): ")
 	listenip, _ := reader.ReadString('\n')
 
 	if len(listenip) <= 2 {
-		listenip = "127.0.0.1:8080"
+		listenip = defaults.BindIP
 	}
 	listenip = strings.TrimSpace(listenip)
 	redir = strings.TrimSpace(redir)
 	if redir == "" {
-		redir = "google.com"
+		redir = defaults.Redirect
 	}
 	bloatedChoiceHandler(choice)
 	loadTheWebMan(choice, listenip, redir)
