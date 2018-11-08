@@ -23,3 +23,13 @@ Choose the the template you want from the list, enter the bind IP and that's it!
 All captured logins are stored in nice little .json files in the 'pwned' directory.
 
 Demo video: https://youtu.be/9UoGnnm_aiI
+
+# Configuration
+You can now change the default vaules. Simply open the `defaults.json` file and update accordingly.
+Example:
+```
+{
+    "Redirect": "amazon.com",
+    "BindIP": "127.0.0.1:8000"
+}
+```
