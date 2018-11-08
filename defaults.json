@@ -1,4 +1,4 @@
 {
-    "Redirect": "amazon.com",
-    "BindIP": "127.0.0.1:8000"
+    "Redirect": "google.com",
+    "BindIP": "127.0.0.1:8080"
 }
