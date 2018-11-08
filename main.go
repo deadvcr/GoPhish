@@ -70,6 +70,7 @@ func menu() {
 	fmt.Println("[14] devianART")
 	fmt.Println("[15] Snapchat")
 	fmt.Println("[16] Netflix")
+	fmt.Println("[17] Amazon")
 	fmt.Println("")
 	fmt.Println("")
 
@@ -129,6 +130,8 @@ func bloatedChoiceHandler(choice string) string {
 		returns = "snapchat"
 	case "16":
 		returns = "netflix"
+	case "17":
+		returns = "amazon"
 	}
 	if returns == "default" {
 		log.Fatal("Please enter a valid option. (Example: '1' for Instagram)")
