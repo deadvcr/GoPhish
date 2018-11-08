@@ -19,3 +19,5 @@ main.exe
 ```
 
 Choose the the template you want from the list, enter the bind IP and that's it! Provided you aren't a complete brainlet and typed in simple numbers correctly, the webserver should be running.
+
+All captured logins are stored in nice little .json files in the 'pwned' directory.
