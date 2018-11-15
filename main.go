@@ -56,23 +56,17 @@ type Defaults struct {
 func main() {
 	initChoices()
 	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
-
-	loaddefaults, err := ioutil.ReadFile("defaults.json")
 	var defaults Defaults
+	loaddefaults, err := ioutil.ReadFile("defaults.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	json.Unmarshal([]byte(loaddefaults), &defaults)
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("[*] Choose an option: ")
-	choice, _ := reader.ReadString('\n')
-	fmt.Print("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
-	redir, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
-	listenip, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
-	listenport, _ := reader.ReadString('\n')
+	choice, _ := userPrompt("[*] Choose an option: ")
+	redir, _ := userPrompt("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
+	listenip, _ := userPrompt("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
+	listenport, _ := userPrompt("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
 
 	if len(listenip) <= 2 {
 		listenip = defaults.BindIP
@@ -240,4 +234,9 @@ func initChoices() {
 	choices[17] = "Amazon"
 }
 
-//func userPrompt(prompt string, )
+func userPrompt(prompt string) (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(prompt)
+	response, err := reader.ReadString('\n')
+	return response, err
+}
