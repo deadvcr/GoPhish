@@ -200,7 +200,7 @@ func displayMenu(warning bool, name string, website string) {
 		"",
 	}
 
-	// initiate choices
+	// initialize choices
 	choices := make(map[int]string)
 	choices[1] = "Instagram"
 	choices[2] = "Facebook"
