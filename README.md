@@ -1,6 +1,6 @@
 # GoPhish
 
-Created by DeadVCR (http://deadvcr.com)
+Created by [DeadVCR](http://deadvcr.com)
 
 A login phishing tool created in Go.
 
