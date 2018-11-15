@@ -28,10 +28,9 @@ import (
 	"strings"
 )
 
-func main() {
-	initChoices()
+/*func main() {
 	menu()
-}
+}*/
 
 var choices map[int]string
 
@@ -54,8 +53,8 @@ type Defaults struct {
 	BindPort string
 }
 
-func menu() {
-
+func main() {
+	initChoices()
 	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
 
 	loaddefaults, err := ioutil.ReadFile("defaults.json")
@@ -240,3 +239,5 @@ func initChoices() {
 	choices[16] = "Netflix"
 	choices[17] = "Amazon"
 }
+
+//func userPrompt(prompt string, )
