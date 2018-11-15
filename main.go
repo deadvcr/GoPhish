@@ -24,6 +24,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -224,9 +225,14 @@ func displayMenu(warning bool, name string, website string) {
 		fmt.Println(v)
 	}
 
-	for k, v := range choices {
-		fmt.Printf("(%d) %s\n", k, v)
+	ints := make([]int, 0, len(choices))
+	for i := range choices {
+		ints = append(ints, i)
 	}
-	fmt.Println("(enter a number...)")
+	sort.Ints(ints)
+
+	for _, v := range ints {
+		fmt.Printf("[%d] %s\n", v, choices[v])
+	}
 
 }
