@@ -14,7 +14,7 @@ Simply build using the Go compiler
 `go build main.go`
 Then execute it.
 
-1. Install the package
+1. Install
     1. `github.com/89apt89/GoPhish`
 2. Build the program
     1. `cd $GOPATH/src/github.com/89apt89/GoPhish`
