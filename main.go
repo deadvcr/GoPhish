@@ -29,8 +29,11 @@ import (
 )
 
 func main() {
+	initChoices()
 	menu()
 }
+
+var choices map[int]string
 
 // Login stores the user's login data
 type Login struct {
@@ -201,8 +204,24 @@ func displayMenu(warning bool, name string, website string) {
 		"",
 	}
 
-	// initialize choices
-	choices := make(map[int]string)
+	for _, v := range strings {
+		fmt.Println(v)
+	}
+
+	ints := make([]int, 0, len(choices))
+	for i := range choices {
+		ints = append(ints, i)
+	}
+	sort.Ints(ints)
+
+	for _, v := range ints {
+		fmt.Printf("[%d] %s\n", v, choices[v])
+	}
+
+}
+
+func initChoices() {
+	choices = make(map[int]string)
 	choices[1] = "Instagram"
 	choices[2] = "Facebook"
 	choices[3] = "Twitter"
@@ -220,19 +239,4 @@ func displayMenu(warning bool, name string, website string) {
 	choices[15] = "Snapchat"
 	choices[16] = "Netflix"
 	choices[17] = "Amazon"
-
-	for _, v := range strings {
-		fmt.Println(v)
-	}
-
-	ints := make([]int, 0, len(choices))
-	for i := range choices {
-		ints = append(ints, i)
-	}
-	sort.Ints(ints)
-
-	for _, v := range ints {
-		fmt.Printf("[%d] %s\n", v, choices[v])
-	}
-
 }
