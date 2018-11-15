@@ -51,17 +51,9 @@ type Defaults struct {
 }
 
 func menu() {
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("Created by @DeadVCR")
-	fmt.Println("http://deadvcr.com/")
-	fmt.Println("")
-	fmt.Println("GoPhish - Login Phishing Tool")
-	fmt.Println("!!WARNING!! - Developers assume no liability and are not responsible to damage")
-	fmt.Println("caused by this program. Please use ONLY for educational purposes. Thank you!")
-	fmt.Println("--> ATTACKING TARGETS WITHOUT CONSENT IS ILLEGAL! <--")
-	fmt.Println("")
-	fmt.Println("Now... Pick your poison :)")
+
+	displayMenu()
+
 	fmt.Println("")
 	fmt.Println("[01] Instagram")
 	fmt.Println("[02] Facebook")
@@ -213,4 +205,23 @@ func (ch *ChoiceHandler) giveMeYourInfo(w http.ResponseWriter, r *http.Request) 
 	theChoice := bloatedChoiceHandler(ch.Choice)
 	p.lmaoOwnedInfo(theChoice)
 	http.Redirect(w, r, "//"+ch.Redir, http.StatusFound)
+}
+
+func displayMenu(warning bool, name string, website string) {
+	strings := []string{
+		"",
+		"Created by " + name,
+		website, "",
+		"GoPhish - Login Phishing Tool",
+		"!!WARNING!! - Developers assume no liability and are not responsible to damage",
+		"caused by this program. Please use ONLY for educational purposes. Thank you!",
+		"--> ATTACKING TARGETS WITHOUT CONSENT IS ILLEGAL! <--",
+		"",
+		"Now... Pick your poison :)",
+	}
+
+	for _, v := range strings {
+		fmt.Println(v)
+	}
+
 }
