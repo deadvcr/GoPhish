@@ -54,27 +54,6 @@ func menu() {
 
 	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
 
-	fmt.Println("")
-	fmt.Println("[01] Instagram")
-	fmt.Println("[02] Facebook")
-	fmt.Println("[03] Twitter")
-	fmt.Println("[04] Google")
-	fmt.Println("[05] PayPal")
-	fmt.Println("[06] Steam")
-	fmt.Println("[07] Linkedin")
-	fmt.Println("[08] eBay")
-	fmt.Println("[09] CryptoCurrency")
-	fmt.Println("[10] Adobe ID")
-	fmt.Println("[11] Messenger")
-	fmt.Println("[12] Twitch")
-	fmt.Println("[13] Badoo")
-	fmt.Println("[14] devianART")
-	fmt.Println("[15] Snapchat")
-	fmt.Println("[16] Netflix")
-	fmt.Println("[17] Amazon")
-	fmt.Println("")
-	fmt.Println("")
-
 	loaddefaults, err := ioutil.ReadFile("defaults.json")
 	var defaults Defaults
 	if err != nil {
@@ -218,10 +197,36 @@ func displayMenu(warning bool, name string, website string) {
 		"--> ATTACKING TARGETS WITHOUT CONSENT IS ILLEGAL! <--",
 		"",
 		"Now... Pick your poison :)",
+		"",
 	}
+
+	// initiate choices
+	choices := make(map[int]string)
+	choices[1] = "Instagram"
+	choices[2] = "Facebook"
+	choices[3] = "Twitter"
+	choices[4] = "Google"
+	choices[5] = "PayPal"
+	choices[6] = "Steam"
+	choices[7] = "Linkedin"
+	choices[8] = "eBay"
+	choices[9] = "CryptoCurrency"
+	choices[10] = "Adobe ID"
+	choices[11] = "Messenger"
+	choices[12] = "Twitch"
+	choices[13] = "Badoo"
+	choices[14] = "devianART"
+	choices[15] = "Snapchat"
+	choices[16] = "Netflix"
+	choices[17] = "Amazon"
 
 	for _, v := range strings {
 		fmt.Println(v)
 	}
+
+	for k, v := range choices {
+		fmt.Printf("(%d) %s", k, v)
+	}
+	fmt.Println("(enter a number...)")
 
 }
