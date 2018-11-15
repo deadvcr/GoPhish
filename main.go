@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -64,6 +65,10 @@ func main() {
 	json.Unmarshal([]byte(loaddefaults), &defaults)
 
 	choice, _ := userPrompt("[*] Choose an option: ")
+	_, err = validateChoice(choice)
+	if err != nil {
+		crash("Your input was invalid.", 2)
+	}
 	redir, _ := userPrompt("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
 	listenip, _ := userPrompt("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
 	listenport, _ := userPrompt("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
@@ -239,4 +244,18 @@ func userPrompt(prompt string) (string, error) {
 	fmt.Print(prompt)
 	response, err := reader.ReadString('\n')
 	return response, err
+}
+
+func validateChoice(choice string) (int, error) {
+	i, err := strconv.Atoi(strings.TrimSpace(choice))
+	if err != nil {
+		return 0, err
+	}
+	return i, nil
+}
+
+func crash(reason string, s int) {
+	fmt.Println(reason)
+	fmt.Printf("Exitting in %d seconds...\n", s)
+	os.Exit(1)
 }
