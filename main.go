@@ -225,7 +225,7 @@ func displayMenu(warning bool, name string, website string) {
 	}
 
 	for k, v := range choices {
-		fmt.Printf("(%d) %s", k, v)
+		fmt.Printf("(%d) %s\n", k, v)
 	}
 	fmt.Println("(enter a number...)")
 
