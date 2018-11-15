@@ -52,7 +52,7 @@ type Defaults struct {
 
 func menu() {
 
-	displayMenu()
+	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
 
 	fmt.Println("")
 	fmt.Println("[01] Instagram")
