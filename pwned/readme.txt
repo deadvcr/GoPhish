@@ -1,1 +1,0 @@
-Don't remove this folder. Grabbed passwords are stored here.

