@@ -31,16 +31,19 @@ func main() {
 	menu()
 }
 
+// Login stores the user's login data
 type Login struct {
 	Username string
 	Password string
 }
 
+// ChoiceHandler stores the user's choice
 type ChoiceHandler struct {
 	Choice string
 	Redir  string
 }
 
+// Defaults store's the connection defaults
 type Defaults struct {
 	Redirect string
 	BindIP   string
