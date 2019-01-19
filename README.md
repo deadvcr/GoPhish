@@ -20,7 +20,7 @@ Then execute it.
     1. `cd $GOPATH/src/github.com/89apt89/GoPhish`
     2. `go build`
 3. Run
-    1. `./GoPhish.exe` (in bash) or `GoPhish.exe` (in cmd prompt)
+    1. `./GoPhish` (in bash) or `GoPhish.exe` (in cmd prompt)
 
 Choose the the template you want from the list, enter the bind IP and that's it! Provided you aren't a complete brainlet and typed in simple numbers correctly, the webserver should be running.
 
